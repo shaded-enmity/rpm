@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Rpm : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Rpm</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/lkardos/rpm">View on GitHub</a>
+
+          <h1 id="project_title">Rpm</h1>
+          <h2 id="project_tagline"></h2>
+        <div id="menu">
+           <ul id="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="documentation.html">Docs</a></li>
+              <li><a href="source.html">Download source</a></li>
+              <li><a href="help.html">Getting help</a></li>
+              <li><a href="contribute.html">Contribute</a></li>
+              <li><a href="software.html">Related Software</a></li>
+           </ul>
+        </div>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <p>One level up: <a href="contribute.html">Contribute</a></p>
+
+<h2 id="rpm-summit">RPM Summit</h2>
+<p>Rough list of ideas and topics that could be brought up on the RPM Summit:</p>
+
+<h3 id="talk-whats-up-in-rpm-developent">Talk: What’s up in RPM developent</h3>
+<p>Talk by Florian Festi. Probably Friday morning (see conf schedule)</p>
+
+<h3 id="general-discussion-about-direction-of-rpm">General discussion about direction of RPM</h3>
+<ul>
+  <li>Major pain points</li>
+  <li>What is upstream planning/considering?</li>
+  <li>… </li>
+</ul>
+
+<h3 id="file-triggers">File triggers</h3>
+<p>This feature is still under construction - Panu is working on it.</p>
+
+<p>File triggers (name still subject to change) are scripts that take care of special file types. Scripts are only part of the package handling the file type (like glibc for all *.so files, fontconfig for all font files) but are invoked for all files that match a given criteria (file name reqex?).</p>
+
+<h3 id="soft-requires">Soft requires</h3>
+<p>Tags for soft requires are still not upstream. May be work out a precise definition so other tools (yum comes to mind) can reimplement them in a compatible way. (see <a href="http://en.opensuse.org/Software_Management/Dependencies">http://en.opensuse.org/Software_Management/Dependencies</a>)</p>
+
+<p>Seth Vidal would like to join the discussion by phone/VoIP. Technical details still to be figured out.</p>
+
+<h3 id="libsatsolver-libzypp">libsatsolver, libzypp</h3>
+<ul>
+  <li>Current status</li>
+  <li>Compatibility (multilib)? </li>
+  <li>Possible base for yum (in the long term)?</li>
+  <li>Language bindings (Python)? </li>
+</ul>
+
+<h3 id="deltarpm">DeltaRPM</h3>
+<ul>
+  <li>Connection to RPM’s codebase</li>
+  <li>new RPM features like file hashes, compression algorithms, … </li>
+  <li>Binary diff algorithm for better compression? </li>
+</ul>
+
+<h3 id="update-scriptlets">update scriptlets</h3>
+<p>When a package is updated, rpm first runs the pre/postinstall scriptlets of the new package and afterwards the pre/postuninstall scriptlets of the old packages. This has the following disadvantages:</p>
+
+<ul>
+  <li>inexperienced packagers don’t expect it</li>
+  <li>you have to add clumsy $0 tests to your scriptlets</li>
+  <li>there’s no way to fix bugs in the uninstall scriptlets </li>
+</ul>
+
+<p>We propose to add a new type of scriplets, called update scriptlets. If a package doesn’t define an update scriptlet, the install/uninstall scriptlets will be run like before. If it defines a scriptlet and an old package gets replaced with a new package, the update scriptlets are called instead of the install scriptlets, and the uninstall scriptlets of the old package are not run.</p>
+
+<p>TBD: called when? called with what argument?</p>
+
+<p>TBD: I am not sure, whether not calling anything from the old instance is a good idea. It complicates the upgrade process in many cases - the new scriptlet may need file lists of all old versions. Also migration from %post/%postun to %postupgrade would be more complicated. Maybe %preup, %postup, %prenew, %postnew, %prerm, %postrm should be called in a similar way than the old scripts, but would be simpler to use and package-rename-wise. Blocking old scripts may be an independent feature.</p>
+
+<h3 id="virtual-triggers">virtual triggers</h3>
+<p>Currently triggers only work with package names. We propose to change the code so that they also work with provides (a patch to rpm already exists). Using virtual triggers together with find-provides allows us to replace many scriptlets with trigger calls, removing a source of many packaging errors.</p>
+
+<h3 id="package-renaming">package renaming</h3>
+<p>Currently rpm only counts the number of packages with the same name when it calculates the argument for scriptlets. This leads to problems when a package is renamed, because the scriptlets are told that the package is installed for the first time. Also, downgrading back to the old name doesn’t work correctly as “Obsoletes” are evaluated in only one way.</p>
+
+<h3 id="scriptlet-arguments">scriptlet arguments</h3>
+<p>Add a convenient way for scriptlet authors to find out which version of the package was installed before/obsoleted. Idea: put headerids in some ENV var, query with –querybynumber.</p>
+
+<h3 id="using-tilde--in-version">Using tilde (~) in version</h3>
+<p>Michael suggested to use the tilde (~) in version numbers. Versions 1.3~foo comes just before 1.3. This feature could be (mis)used as a version separator in kernel packages. That solves the problem that 2.6.31_8.1.3 is newer than 2.6.31.1_8.1.3 (whereas 2.6.31~8.1.3 is older than 2.6.31.1~8.1.3). There is already a ticket for that: <a href="http://rpm.org/ticket/56">http://rpm.org/ticket/56</a></p>
+
+<p>Also see <a href="https://bugzilla.novell.com/show_bug.cgi?id=540558">https://bugzilla.novell.com/show_bug.cgi?id=540558</a>, <a href="https://bugzilla.novell.com/show_bug.cgi?id=466994">https://bugzilla.novell.com/show_bug.cgi?id=466994</a> </p>
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Rpm maintained by <a href="https://github.com/lkardos">lkardos</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

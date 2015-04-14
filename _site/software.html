@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Rpm : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Rpm</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/lkardos/rpm">View on GitHub</a>
+
+          <h1 id="project_title">Rpm</h1>
+          <h2 id="project_tagline"></h2>
+        <div id="menu">
+           <ul id="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="documentation.html">Docs</a></li>
+              <li><a href="source.html">Download source</a></li>
+              <li><a href="help.html">Getting help</a></li>
+              <li><a href="contribute.html">Contribute</a></li>
+              <li><a href="software.html">Related Software</a></li>
+           </ul>
+        </div>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <h2 id="software-related-to-rpm">Software related to RPM</h2>
+
+<p>Here you can find links to software related to RPM such as frontends, packaging tools etc.</p>
+
+<h3 id="rpm-frontends--depsolvers">RPM Frontends / Depsolvers</h3>
+
+<ul>
+  <li><a href="http://yum.baseurl.org/">YUM</a> is an RPM frontend written in Python.</li>
+  <li><a href="http://en.opensuse.org/Libzypp">libzypp/zypper</a> is an RPM frontend written in C/C++ (used by openSUSE, SLES and Ark Linux). It uses <a href="https://github.com/openSUSE/libsolv">SAT solver</a> for dependency solving.</li>
+  <li><a href="https://github.com/akozumpl/dnf">DNF</a> is an RPM frontend written in Python. It uses <a href="https://github.com/openSUSE/libsolv">SAT solver</a> for the hard work.</li>
+  <li><a href="http://gitweb.mageia.org/software/rpm/urpmi/">Urpmi</a> is an RPM frontend written in Perl (used by Mageia and Mandriva)</li>
+  <li><a href="http://apt-rpm.org/">APT-RPM</a> is an RPM port of the Debian APT package management tool written in C++.</li>
+  <li><a href="http://labix.org/smart">SmartPM</a> is another frontend for RPM (also works with DEB, Slackware etc packaging formats) written mostly in Python</li>
+  <li><a href="http://poldek.pld-linux.org/">Poldek</a> is another frontend for RPM, primarily used by the PLD distribution. </li>
+</ul>
+
+<h3 id="packager-tools">Packager tools</h3>
+<ul>
+  <li><a href="http://rpmlint.zarb.org/">rpmlint</a> is a tool for checking for common errors in RPM packaging.</li>
+  <li><a href="https://hosted.fedoraproject.org/projects/rpmdevtools">rpmdevtools</a> contains scripts and (X)Emacs support files to aid in RPM packaging.</li>
+  <li><a href="http://search.cpan.org/~ecalder/cpan2rpm/">cpan2rpm</a> generates RPM packages from Perl CPAN modules.</li>
+  <li><a href="http://cpanspec.sourceforge.net/">cpanspec</a> is another tool for creating RPM packages from Perl CPAN modules.</li>
+  <li><a href="http://rpmrebuild.sourceforge.net/">rpmrebuild</a> is a tool that can generate a spec from an already installed RPM (useful when you don’t have access to real source rpm, eg with packages of proprietary software)</li>
+  <li><a href="http://www.eclipse.org/linuxtools/projectPages/specfile/">Specfile Editor</a> is a spec file editor plugin for Eclipse.</li>
+  <li><a href="http://www.eclipse.org/linuxtools/projectPages/rpmstubby/">RPM Stubby</a> is a spec file generator plugin for Eclipse. </li>
+</ul>
+
+<h3 id="build-tools">Build tools</h3>
+<ul>
+  <li><a href="http://openbuildservice.org/">Open Build Service</a> is a generic build- and distribution system.</li>
+  <li><a href="https://fedorahosted.org/copr/">Copr</a> is a lightweight build- and distribution system.</li>
+  <li><a href="https://fedorahosted.org/koji/">Koji</a> is a package build and tracking system.</li>
+  <li><a href="https://hosted.fedoraproject.org/projects/mock/">Mock</a> is a ‘simple’ chroot build environment manager for building RPMs.</li>
+  <li><a href="http://thomas.apestaart.org/projects/mach/">Mach</a> is a more generic chroot environment manager that can also be used for building RPMs.</li>
+  <li><a href="http://beta.kainx.org/wiki/view/Mezzanine">Mezzanine</a> is a set of tools which simplify the management of software packages and collections of software packages. </li>
+</ul>
+
+<h3 id="other-tools">Other tools</h3>
+<ul>
+  <li><a href="http://gitorious.org/deltarpm/">DeltaRPM</a> contais tools for creating and applying change deltas of RPM packages</li>
+  <li><a href="http://www.nongnu.org/rpm2html/">rpm2html</a> generates web pages that describe a set of RPM packages.</li>
+  <li><a href="https://fedorahosted.org/rpmreaper/">rpmreaper</a> is a ncurses-based application for finding unnecessary packages in the system.</li>
+  <li><a href="https://github.com/openSUSE/libsolv">libsolv</a> is library for package dependency resolution. </li>
+</ul>
+
+<h3 id="language-bindings">Language bindings</h3>
+<ul>
+  <li><a href="http://search.cpan.org/dist/RPM2/">perl-RPM2</a> provides an object-oriented interface to RPM facilities for Perl.</li>
+  <li><a href="http://search.cpan.org/dist/RPM-Specfile/">RPM-Specfile</a> is a Perl extension for creating RPM specfiles.</li>
+  <li><a href="http://rubyforge.org/projects/ruby-rpm/">Ruby-RPM</a> provides Ruby bindings to RPM.</li>
+  <li>Python bindings for RPM are distributed as part of <a href="https://github.com/lkardos/rpm/wiki/Download-source">RPM releases</a>.</li>
+  <li><a href="http://jrpm.sourceforge.net/">JRPM</a> is a java library to manipule and create RPM archives.</li>
+  <li><a href="http://www.introspectrum.com/oss/">Redline</a> is a pure Java library for manipulating RPM Package Manager packages.</li>
+  <li><a href="http://cekirdek.uludag.org.tr/~meren/php_rpm/">phprpm</a> provides some basic functionality for accessing RPM files from PHP programs.</li>
+  <li><a href="http://gitweb.mageia.org/software/rpm/perl-URPM/">perl-URPM</a> is a Perl extension for manipulating rpm headers and packages.</li>
+  <li><a href="https://github.com/openSUSE/libsolv">libsolv</a> has bindings for Perl, Python and Ruby. </li>
+</ul>
+
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Rpm maintained by <a href="https://github.com/lkardos">lkardos</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

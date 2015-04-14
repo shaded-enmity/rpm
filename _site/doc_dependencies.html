@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Rpm : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Rpm</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/lkardos/rpm">View on GitHub</a>
+
+          <h1 id="project_title">Rpm</h1>
+          <h2 id="project_tagline"></h2>
+        <div id="menu">
+           <ul id="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="documentation.html">Docs</a></li>
+              <li><a href="source.html">Download source</a></li>
+              <li><a href="help.html">Getting help</a></li>
+              <li><a href="contribute.html">Contribute</a></li>
+              <li><a href="software.html">Related Software</a></li>
+           </ul>
+        </div>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <p>Dependencies provide a way for a package builder to require other packages or capabilities to be installed before or simultaneously with one another. These can be used to require a python interpretor for a python based application for example. RPM ensures dependencies are satisfied whenever packages are installed, erased, or upgraded. This page describes the basics. More topics can be found on More On Dependencies.</p>
+
+<h3 id="the-package-name">The Package name</h3>
+<p>The package name is the most important way to refere to a package. Updates also follow the package name and packages with the same name constitute a line of updates of which only the newest is considered up to date. So if two version if the same software are supposed to be installed at the same time they have to go into packages with different names that of course need to reside at different locations on disk). A typical way of doing this is to as the unchanging part of the version number part of the name. E.g. python3-3.2.1-1.</p>
+
+<h3 id="obsoletes">Obsoletes</h3>
+<p>Obsoletes alter the way updates work. This plays out a bit different depending if rpm is used directly on the command line or the update is performed by an updates/dependency solver.</p>
+
+<p>RPM removes all packages matching obsoletes of packages being installed. As it sees the obsoleting package as their updates. There has not to be a one to one relation ship between obsoleting and obsoleted packages. Note that rpm -i does not do updates and though treat Obsoletes: as Conflicts (since rpm-4.10). For most cases rpm -i should be avoided and rpm -U should be used unless this specific behavior is desired (e.g. for kernels).</p>
+
+<p>Updaters have a bit different view on Obsoletes: as they need to find out what packages to install as an update. As a result packages containing matching Obsoletes: are added as updates and replace the matching packages.</p>
+
+<h3 id="provides">Provides</h3>
+<p>Provides can be added to packages so they can be refered to by dependencies other than by their name. E.g. you need to make sure the system your package is being installed on has a package which provides a certain capability, even though you don’t care what specific package provides it. For example, sendmail won’t work properly unless a local delivery agent (lda) is present. You can ensure that one is installed like this:</p>
+<pre>
+    Requires: lda
+</pre>
+<p>This will match either a package called lda (as mentioned above), or any package which contains:</p>
+<pre>
+    Provides: lda
+</pre>
+<p>in its .spec file. No version numbers may be used with virtual packages.</p>
+
+<p>Provides are often used to supply file dependencies such as /bin/sh on machines that are only partly managed by rpm. A virtual package with</p>
+<pre>
+    Provides: /bin/sh
+</pre>
+<p>differs from a package that has /bin/sh in the %files list in that the package can be safely removed without removing /bin/sh.</p>
+
+<h3 id="requires">Requires</h3>
+<p>With this tag a package can require another with the matching name or Provides to be installed (if the package containign the Requires: is going to be installed). This is checked when a new package is installed and if a package with a matching Provides: is removed.</p>
+
+<p>To require the packages python and perl, use:</p>
+<pre>
+    Requires: python perl
+</pre>
+<p>in the spec file. Note that “Requires python, perl” would work as well. If you needed to have a very recent version of python but any version of perl,</p>
+<pre>
+    Requires: python &gt;= 1.3, perl
+</pre>
+<p>would do the trick. Again, the ‘,’ in the line is optional. Instead of ‘&gt;=’, you may also use ‘&lt;’, ‘&gt;’, ‘&lt;=’, or ‘=’. Spaces are required around the numeric operator to separate the operator from the package name.</p>
+
+<h3 id="versioning">Versioning</h3>
+<p>The full syntax for specifying a dependency on an epoch, version and release is</p>
+<pre>
+    [epoch:]version[-release]
+</pre>
+<p>where</p>
+<pre>
+    epoch   (optional) number, with assumed default of 0 if not supplied
+    version (required) can contain any character except '-'
+    release (optional) can contain any character except '-'
+</pre>
+<p>For example,</p>
+<pre>
+    Requires: perl &gt;= 9:5.00502-3
+</pre>
+<p>specifies</p>
+<pre>
+    epoch=9
+    version=5.00502
+    release=3
+</pre>
+<p>The epoch (if present) is a monotonically increasing integer, neither the version or the release can contain the ‘-‘ hyphen character, and the dependency parser does not permit white space within a definition. Unspecified epoch and releases are assumed to be zero, and are interpreted as “providing all” or “requiring any” value.</p>
+
+<p>The release tag is usually incremented every time a package is rebuilt for any reason, even if the source code does not change. For example, changes to the specfile, compiler(s) used to build the package, and/or dependency changes should all be tracked by incrementing the release. The version number, on the other hand, is usually set by the developer or upstream maintainer, and should not be casually modified by the packager.</p>
+
+<p>Version numbering should be kept simple so that it is easy to determine the version ordering for any set of packages. If the packager needs to separate a release from all other releases that came before it, then the epoch, the most significant part of package ordering, can be changed.</p>
+
+<p>The algorithm that RPM uses to determine the version ordering of packages is simple and developers are encouraged not to rely on the details of its working. Developers should keep their numbering scheme simple so any reasonable ordering algorithm would work. The version comparison algorithm is in the routine rpmvercmp() and it is just a segmented strcmp(3). First, the boundaries of the segments are found using isdigit(3)/isalpha(3). Each segment is then compared in order with the right most segment being the least significant. The alphabetical portions are compared using a lexical graphical ascii ordering, the digit segments strip leading zeroes and compare the strlen before doing a strcmp. If both numerical strings are equal, the longer string is larger. Notice that the algorithm has no knowledge of decimal fractions, and perl-5.6 is “older” than perl-5.00503 because the number 6 is less than the number 503.</p>
+
+<p>The concept of “newer” used by rpm to determine when a package should be upgraded can be broken if version format changes oddly, such as when the version segments cannot be meaningfully compared.</p>
+
+<p>Example of a bad format change: 2.1.7Ax to 19980531</p>
+<pre>
+  The date may be the older version, but it is numerically greater
+  2 so it is considered newer :(
+</pre>
+<p>Example of a bad increment: 2.1.7a to 2.1.7A</p>
+<pre>
+  The 'a' (ASCII 97) is compared against 'A' (ASCII 65), making 2.1.7a
+  the newer version.
+</pre>
+<p>Stick to major.minor.patchlevel using numbers for each if you can. Keeps life simple :-)</p>
+
+<p>If a Requires: line needs to include an epoch in the comparison, then the line should be written like</p>
+<pre>
+    Requires: somepackage = 23:version
+</pre>
+<p>You can’t continue a “Requires: “ line. If you have multiple “Requires: “ lines then the package requires all packages mentioned on all of the lines to be installed.</p>
+
+<h3 id="conflicts">Conflicts</h3>
+<p>Conflicts are basically inverse Requires. If there is a matching package the package cannot be installed. It does not matter whether the Conflict: tag is on the already installed or to be installed package.</p>
+
+<p>The qmail spec file may codify this with a line like:</p>
+<pre>
+    Conflicts: sendmail
+</pre>
+<p>Dependency checking (including checking for conflicts) may be overridden by using the –nodeps flag.</p>
+
+<h3 id="weak-dependencies">Weak dependencies</h3>
+
+<p>In addition to the strong dependencies created by Requires, there are 4 dependencies that are completely ignored by rpm itself. Their purpose is to be used by dependency solvers to make choices about what packages to install. They come in two levels of strength:</p>
+
+<ul>
+  <li>Weak: By default the dependency solver shall attempt to process the dependency </li>
+</ul>
+
+<p>as though it were strong. If this is results in an error then they should be ignored and not trigger an error or warning.</p>
+
+<ul>
+  <li>Very weak: By default the dependency solver shall ignore them. But they may be used to show the matching packages as option to the user. </li>
+</ul>
+
+<p>The depsolver may offer to treat the weak like very weak relations or the other way round.</p>
+
+<p>In addition to normal, forward relations that behave the same way as Requires: there are also two weak dependencies that work backward. Instead of adding packages that match the relations of to-be-installed packages these Relations add packages that contain relations matching to-be-installed packages.</p>
+
+<p>There are two dependency types at each level of strength. One is a forward relation, similar to Requires; the other is a reverse relation. For reverse relation the roles of the declaring and matching package(s) are switched out.</p>
+<table>
+<tr><td></td><td>Forward</td><td>Reverse</td></tr>
+<tr><td>Weak</td><td>Recommends:</td><td>Supplements:</td></tr>
+<tr><td>Very Weak</td><td>Suggests:</td><td>Enhances:</td></tr>
+</table>
+<p>So installing a package containing Recommends: foo should cause the dependency solver to also select a package that is named foo or that Provides: foo, assuming one exists and its selection does not lead to unresolvable dependencies.</p>
+
+<p>On the other hand, if a package that is named foo or that Provides: foo is selected, and a package bar containing Supplements: foo” exists, then bar is also selected as long as doing so does not lead to unresolvable dependencies.</p>
+
+<p>In other words, if you have packages A and B and you want to declare a weak relation between them A -&gt; B, you can either specify it as package A containing Recommends: B or package B containing Supplements: A.</p>
+
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Rpm maintained by <a href="https://github.com/lkardos">lkardos</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

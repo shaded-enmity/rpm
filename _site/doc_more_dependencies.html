@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Rpm : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Rpm</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/lkardos/rpm">View on GitHub</a>
+
+          <h1 id="project_title">Rpm</h1>
+          <h2 id="project_tagline"></h2>
+        <div id="menu">
+           <ul id="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="documentation.html">Docs</a></li>
+              <li><a href="source.html">Download source</a></li>
+              <li><a href="help.html">Getting help</a></li>
+              <li><a href="contribute.html">Contribute</a></li>
+              <li><a href="software.html">Related Software</a></li>
+           </ul>
+        </div>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <h3 id="architecture-specific-dependencies">Architecture-specific Dependencies</h3>
+
+<p>Starting with rpm 4.6.0, it’s possible to specify dependencies to be specific to a given architecture family:</p>
+<pre>
+         Requires: somepackage%{?_isa} = version
+</pre>
+<p>For further details about this feature, see <a href="">PackagerDocs/ArchDependencies</a>.</p>
+
+<h3 id="scriptlet-dependencies">Scriptlet Dependencies</h3>
+<p>Often package scriptlets need various other packages in order to execute correctly, and sometimes those dependencies aren’t even needed at runtime, only for installation. Such install/erase-time dependencies can be expressed with “Requires(<scriptlet>): <dependency>" notation, for example the following tells rpm that useradd program is needed by the package %pre scriptlet (often the case if a package uses a custom group/username for its files):</dependency></scriptlet></p>
+<pre>
+        Requires(pre): /usr/sbin/useradd
+</pre>
+<p>This has two “side-effects”:
+* It ensures that the package providing /usr/sbin/useradd is installed before this package. In presence of dependency loops, scriptlet dependencies are the only way to ensure correct install order.
+* If there are no other dependencies on the package providing /usr/sbin/useradd, that package is permitted to be removed from the system after installation(!) </p>
+
+<p>It’s a fairly common mistake to replace legacy PreReq dependencies with Requires(pre), but this is not the same, due to the latter point above!</p>
+
+<h3 id="automatic-dependencies">Automatic Dependencies</h3>
+<p>To reduce the amount of work required by the package builder, RPM scans the file list of a package when it is being built. Any files in the file list which require shared libraries to work (as determined by ldd) cause that package to require the shared library.</p>
+
+<p>For example, if your package contains /bin/vi, RPM will add dependencies for both libtermcap.so.2 and libc.so.5. These are treated as virtual packages, so no version numbers are used.</p>
+
+<p>A similar process allows RPM to add Provides information automatically. Any shared library in the file list is examined for its soname (the part of the name which must match for two shared libraries to be considered equivalent) and that soname is automatically provided by the package. For example, the libc-5.3.12 package has provides information added for libm.so.5 and libc.so.5. We expect this automatic dependency generation to eliminate the need for most packages to use explicit Requires: lines.</p>
+
+<h3 id="custom-automatic-dependency">Custom Automatic Dependency</h3>
+<p>Customizing automatic dependency generation is covered in <a href="">dependency generator documentation</a>.</p>
+
+<h3 id="interpreters-and-shells">Interpreters and Shells</h3>
+<p>Modules for interpreted languages like perl and tcl impose additional dependency requirements on packages. A script written for an interpreter often requires language specific modules to be installed in order to execute correctly. In order to automatically detect language specific modules, each interpreter may have its own <a href="">Docs/DependencyGenerator generators</a>. To prevent module name collisions between interpreters, module names are enclosed within parentheses and a conventional interpreter specific identifier is prepended:</p>
+<pre>
+  Provides: perl(MIME-Base64), perl(Mail-Header)-1-09
+
+  Requires: perl(Carp), perl(IO-Wrap) = 4.5
+</pre>
+<p>The output of a per-interpreter dependency generator (notice in this example the first requirement is a package and the rest are language specific modules)</p>
+<pre>
+    Mail-Header &gt;= 1.01
+    perl(Carp) &gt;= 3.2
+    perl(IO-Wrap) == 4.5 or perl(IO-Wrap)-4.5
+</pre>
+<p>the output from dependency generator is</p>
+<pre>
+    Foo-0.9
+    perl(Widget)-0-1
+</pre>
+
+<h3 id="installing-and-erasing-packages-with-dependencies">Installing and Erasing Packages with Dependencies</h3>
+<p>For the most part, dependencies should be transparent to the user. However, a few things will change.</p>
+
+<p>First, when packages are added or upgraded, all of their dependencies must be satisfied. If they are not, an error message like this appears:</p>
+<pre>
+    failed dependencies:
+        libICE.so.6  is needed by somepackage-2.11-1
+        libSM.so.6  is needed by somepackage-2.11-1
+        libc.so.5  is needed by somepackage-2.11-1
+</pre>
+<p>Similarly, when packages are removed, a check is made to ensure that no installed packages will have their dependency conditions break due to the packages being removed. If you wish to turn off dependency checking for a particular command, use the –nodeps flag.</p>
+
+<h3 id="querying-for-dependencies">Querying for Dependencies</h3>
+<p>Two new query information selection options are now available. The first, –provides, prints a list of all of the capabilities a package provides. The second, –requires, shows the other packages that a package requires to be installed, along with any version number checking.</p>
+
+<p>There are also two new ways to search for packages. Running a query with –whatrequires &lt;item&gt; queries all of the packages that require &lt;item&gt;. Similarly, running –whatprovides &lt;item&gt; queries all of the packages that provide the &lt;item&gt; virtual package. Note that querying for package that provides “python” will not return anything, as python is a package, not a virtual package.</p>
+
+<h3 id="verifying-dependencies">Verifying Dependencies</h3>
+<p>As of RPM 2.2.2, -V (aka –verify) verifies package dependencies by default. You can tell rpm to ignore dependencies during system verification with the –nodeps. If you want RPM to verify just dependencies and not file attributes (including file existence), use the –nofiles flag. Note that “rpm -Va –nofiles –nodeps” will not verify anything at all, nor generate an error message.</p>
+
+<h3 id="branching-version">Branching Version</h3>
+<p>It is quite common to need to branch a set of sources in version control. It is not so obvious how those branches should be represented in the package version numbers. Here is one solution.</p>
+
+<p>You have a bag of features that are injected into a package in a non-ordered fashion, and you want to have the package name-version-release be able to:</p>
+<pre>
+    1) identify the "root version" of the source code.
+    2) identify the handful of features that are in that
+       branch of the package.
+    3) preserve sufficient ordering so that packages upgrade
+       without the use of --oldpackage.
+</pre>
+<p>A simple (but possibly not adequate) scheme to achieve this is:</p>
+<pre>
+    Name: foo
+    Version: &lt;the "root version" of the source code&gt;
+    Release: &lt;release instance&gt;.&lt;branch&gt;
+</pre>
+<p>where the release instance is something like YYYMMMDD or some linear record of the number of builds with the current tar file, it is used to preserve ordering when necessary.</p>
+
+<p>Another alternative scheme might be:</p>
+<pre>
+    Name: foo
+    Epoch: &lt;branch&gt;
+    Version: &lt;the branch specific version of the code&gt;
+    Release: &lt;release instance&gt;
+</pre>
+
+<h3 id="build-dependencies">Build dependencies</h3>
+<p>The following dependencies need to be fullfilled at build time. These are similar to the install time version but these apply only during package creation and are specified in the specfile. They end up as “regular” dependencies of the source package (SRPM) (BuildRequires? become Requires) but are not added to the binary package at all.</p>
+<pre>
+    BuildRequires:
+    BuildConflicts:
+    BuildPreReq:
+</pre>
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Rpm maintained by <a href="https://github.com/lkardos">lkardos</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

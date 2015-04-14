@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Rpm : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Rpm</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/lkardos/rpm">View on GitHub</a>
+
+          <h1 id="project_title">Rpm</h1>
+          <h2 id="project_tagline"></h2>
+        <div id="menu">
+           <ul id="nav">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="documentation.html">Docs</a></li>
+              <li><a href="source.html">Download source</a></li>
+              <li><a href="help.html">Getting help</a></li>
+              <li><a href="contribute.html">Contribute</a></li>
+              <li><a href="software.html">Related Software</a></li>
+           </ul>
+        </div>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      <p>Rpmbuild supports conditional package builds with the command line switches –with and –without.</p>
+
+<p>Here is an example to enable gnutls and disable openssl support:</p>
+<pre>
+$ rpmbuild -ba newpackage.spec --with gnutls --without openssl
+</pre>
+
+<h3 id="enable---with--without-parameters">Enable –with/–without parameters</h3>
+<p>To use this feature in a spec file, add this to the beginning of the spec:</p>
+<pre>
+# add --with gnutls option, i.e. disable gnutls by default
+%bcond_with gnutls
+# add --without openssl option, i.e. enable openssl by default
+%bcond_without openssl 
+</pre>
+
+<p>If you want to change whether or not an option is enabled by default, only change %bcond_with to %bcond_without or vice versa. The remainder of the spec file needs to stay the same.</p>
+
+<h3 id="check-wether-an-option-is-enabled">Check wether an option is enabled</h3>
+<p>To define BuildRequires depending on the commandline switch, you can use the %{with foo} macro:</p>
+
+<pre>
+%if %{with gnutls}
+BuildRequires:  gnutls-devel
+%endif
+%if %{with openssl}
+BuildRequires:  openssl-devel
+%endif
+</pre>
+
+<h3 id="pass-it-to-configure">Pass it to %configure</h3>
+
+<p>To pass this option to configure or other scripts than understand a –with-foo or –without-foo parameter, you can use the %{?_with_foo} macro:</p>
+<pre>
+%configure \
+        %{?_with_gnutls} \
+                %{?_with_openssl}
+                </pre>
+
+<h3 id="references">References</h3>
+<ul>
+  <li><a href="https://github.com/rpm-software-management/rpm/blob/master/doc/manual/conditionalbuilds">doc/manual/conditionalbuilds</a></li>
+  <li><a href="https://github.com/rpm-software-management/rpm/blob/master/macros.in">macros</a> </li>
+</ul>
+
+
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Rpm maintained by <a href="https://github.com/lkardos">lkardos</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
