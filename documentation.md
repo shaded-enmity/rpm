@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Home
+title: Documentation
 ---
 This page attempts to track the various relevant documentation that exists for RPM.
 
@@ -14,7 +14,7 @@ This page attempts to track the various relevant documentation that exists for R
 
 ### Packager Documentation
 * [Creating RPMS](http://www.gurulabs.com/GURULABS-RPM-LAB/GURULABS-RPM-GUIDE-v1.0.PDF) slides from [Guru Labs](http://www.gurulabs.com/)
-* Fedora RPM Guide
+* [Fedora RPM Guide](http://docs.fedoraproject.org/en-US/Fedora_Draft_Documentation/0.1/html/RPM_Guide/index.html)
 * In wiki:
   * [Conditional Builds (rpmbuild &#8211;&#8211;with/&#8211;&#8211;without)](doc_conditional_builds.html)
   * [Dependencies](doc_dependencies.html)
